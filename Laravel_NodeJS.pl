@@ -206,9 +206,10 @@ return (0, "Changing shell to /bin/bash failed: ".
 ##workaround ## failed when using run_as_domain_user##so we just sudo to that user and run the commads
 	$shell_out = <<`SHELL`;
 cd $d->{'home'}
+EXPECTED_SIGNATURE=`wget -q -O - https://composer.github.io/installer.sig`
 sudo -H -u $d->{'user'} whoami
 sudo -H -u $d->{'user'} php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-sudo -H -u $d->{'user'} php -r "if (hash_file('SHA384', 'composer-setup.php') === '669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+sudo -H -u $d->{'user'} php -r "if (hash_file('SHA384', 'composer-setup.php') === $EXPECTED_SIGNATURE) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 sudo -H -u $d->{'user'} php composer-setup.php
 sudo -H -u $d->{'user'} php -r "unlink('composer-setup.php');"
 SHELL
